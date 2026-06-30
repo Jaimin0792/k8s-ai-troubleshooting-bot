@@ -1,4 +1,4 @@
-name: CI + Build + Push GHCR
+name: CI + CD Pipeline
 
 on:
   push:
@@ -31,3 +31,20 @@ jobs:
 
       - name: Push Docker image
         run: docker push $IMAGE_NAME
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            docker pull ghcr.io/jaimin0792/k8s-ai-bot:latest
+            docker stop k8s-ai || true
+            docker rm k8s-ai || true
+            docker run -d -p 8000:8000 --name k8s-ai ghcr.io/jaimin0792/k8s-ai-bot:latest
