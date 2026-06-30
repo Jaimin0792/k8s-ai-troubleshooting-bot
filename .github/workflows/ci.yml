@@ -7,11 +7,14 @@ on:
 
 permissions:
   contents: read
-  packages: write   # 👈 REQUIRED for GHCR
+  packages: write
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+
+    env:
+      IMAGE_NAME: ghcr.io/jaimin0792/k8s-ai-bot:latest
 
     steps:
       - name: Checkout code
@@ -24,9 +27,7 @@ jobs:
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Build Docker image
-        run: |
-          docker build -t ghcr.io/${{ github.actor }}/k8s-ai-bot:latest .
+        run: docker build -t $IMAGE_NAME .
 
       - name: Push Docker image
-        run: |
-          docker push ghcr.io/${{ github.actor }}/k8s-ai-bot:latest
+        run: docker push $IMAGE_NAME
