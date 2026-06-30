@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ai-bot-service
+spec:
+  selector:
+    app: ai-bot
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8000
+  type: ClusterIP
